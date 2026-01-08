@@ -1,10 +1,11 @@
 # ---- build stage ----
-FROM node:22-bookworm-slim AS build
+FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
 # CI-friendly env
 ENV HUSKY=0
 ENV CI=true
+ENV NODE_ENV=production
 
 # Use pnpm
 RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
@@ -27,7 +28,7 @@ COPY . .
 RUN pnpm install --offline --frozen-lockfile
 
 # Build the Remix app (SSR + client)
-RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
+RUN NODE_ENV=production NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 
 # ---- production dependencies stage ----
 FROM build AS prod-deps
